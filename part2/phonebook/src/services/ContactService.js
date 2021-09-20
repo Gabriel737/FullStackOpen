@@ -3,7 +3,6 @@ const baseUrl = 'http://localhost:3001/persons'
 
 const getAll = () => {
   const request = axios.get(baseUrl)
-  console.group(request)
   return request.then(response => response.data)
 }
 
@@ -17,5 +16,10 @@ const update = (id, newObject) => {
   return request.then(response => response.data)
 }
 
-const exports = { getAll, create, update }
+const remove = (id) => {
+  const request = axios.delete(`${baseUrl}/${id}`)
+  return request.then(response => response.data)
+}
+
+const exports = { getAll, create, update, remove }
 export default exports
