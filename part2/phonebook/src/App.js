@@ -17,21 +17,35 @@ const App = () => {
       response => setPersons(response)), 
   [])
 
+  const handleDelete = (id) => {
+    return () => {
+      if(window.confirm('Are you sure you would like to delete this user?')) {
+        setPersons(persons.filter(person => person.id !== id))
+        contactService.remove(id)
+      }
+    }
+  }
+
   const handleSubmit = (event) => {
+
     event.preventDefault()
+    const newPerson = {name: newName, number: newNumber}
+    const result = persons.find(person => person.name === newName)
 
-    if(persons.filter(person => person.name === newName).length !== 0) {
-      window.alert(`${newName} has already been entered in the phonebook!`)
+    if(result) {
+      if(window.confirm(`${result.name} is already a contact. Would you like to update his phone number?`)) {
+        contactService.update(result.id, newPerson).then(returnedPerson => {
+          setPersons(persons.map(person => person.id === result.id ? newPerson : person))
+        })
+      }
     } else {
-
-      const newPerson = {name: newName, number: newNumber}
-
       contactService.create(newPerson).then(returnedPerson => {
         setPersons(persons.concat(returnedPerson))
-        setNewName('')
-        setNewNumber('')
       })
     }
+
+    setNewName('')
+    setNewNumber('')
   }
 
   return (
@@ -60,7 +74,7 @@ const App = () => {
         </div>
       </form>
       <h2>Numbers</h2>
-      <Content persons={persons} newFilter={newFilter} />
+      <Content persons={persons} newFilter={newFilter} handleDelete={handleDelete} />
     </div>
   )
 }
