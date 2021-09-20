@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
-import axios from 'axios'
 import Filter from './components/Filter'
 import Content from './components/Content'
+import contactService from './services/ContactService'
 
 const App = () => {
   const [ persons, setPersons ] = useState([])
@@ -13,11 +13,9 @@ const App = () => {
   const handleNumberChange = (event) => setNewNumber(event.target.value)
   const handleFilterChange = (event) => setNewFilter(event.target.value)
 
-
-  const hook = () => axios.get('http://localhost:3001/persons')
-    .then(response => setPersons(response.data))
-
-  useEffect(hook, [])
+  useEffect(() => contactService.getAll().then(
+      response => setPersons(response)), 
+  [])
 
   const handleSubmit = (event) => {
     event.preventDefault()
@@ -25,7 +23,14 @@ const App = () => {
     if(persons.filter(person => person.name === newName).length !== 0) {
       window.alert(`${newName} has already been entered in the phonebook!`)
     } else {
-      setPersons(persons.concat({name: newName, phonenumber: newNumber}))
+
+      const newPerson = {name: newName, number: newNumber}
+
+      contactService.create(newPerson).then(returnedPerson => {
+        setPersons(persons.concat(returnedPerson))
+        setNewName('')
+        setNewNumber('')
+      })
     }
   }
 
