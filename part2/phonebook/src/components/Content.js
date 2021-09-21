@@ -10,7 +10,7 @@ const Content = ({persons, newFilter, handleDelete}) => (
         (person, i) => (
           <p key={i}>
             <Person key={i} person={person} />
-            <button onClick={handleDelete(person.id)} type="submit">delete</button>
+            <button onClick={handleDelete(person)} type="submit">delete</button>
           </p>
         )
       )

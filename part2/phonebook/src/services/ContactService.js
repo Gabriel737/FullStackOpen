@@ -16,9 +16,12 @@ const update = (id, newObject) => {
   return request.then(response => response.data)
 }
 
-const remove = (id) => {
+const remove = (id, setBanner) => {
   const request = axios.delete(`${baseUrl}/${id}`)
-  return request.then(response => response.data)
+  return request.then(response => {
+    setBanner(`Person has been removed from the database!`)
+    return response.data
+  }).catch(error => setBanner('Error! That person has already been removed from the database!'))
 }
 
 const exports = { getAll, create, update, remove }

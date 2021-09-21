@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import Filter from './components/Filter'
 import Content from './components/Content'
+import Banner from './components/Banner'
 import contactService from './services/ContactService'
 
 const App = () => {
@@ -8,6 +9,8 @@ const App = () => {
   const [ newName, setNewName ] = useState('')
   const [ newNumber, setNewNumber ] = useState('')
   const [ newFilter, setNewFilter ] = useState('')
+  const [ bannerMessage, setBannerMessage ] = useState('Contacts loaded from JSON database!')
+
 
   const handleNameChange = (event) => setNewName(event.target.value)
   const handleNumberChange = (event) => setNewNumber(event.target.value)
@@ -17,11 +20,11 @@ const App = () => {
       response => setPersons(response)), 
   [])
 
-  const handleDelete = (id) => {
+  const handleDelete = (personToRemove) => {
     return () => {
       if(window.confirm('Are you sure you would like to delete this user?')) {
-        setPersons(persons.filter(person => person.id !== id))
-        contactService.remove(id)
+        setPersons(persons.filter(person => person.id !== personToRemove.id))
+        contactService.remove(personToRemove.id, setBannerMessage)
       }
     }
   }
@@ -36,11 +39,13 @@ const App = () => {
       if(window.confirm(`${result.name} is already a contact. Would you like to update his phone number?`)) {
         contactService.update(result.id, newPerson).then(returnedPerson => {
           setPersons(persons.map(person => person.id === result.id ? newPerson : person))
+          setBannerMessage(`${newPerson.name}\'s record has been updated!`)
         })
       }
     } else {
       contactService.create(newPerson).then(returnedPerson => {
         setPersons(persons.concat(returnedPerson))
+        setBannerMessage(`${newPerson.name} added to database!`)
       })
     }
 
@@ -51,6 +56,8 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+
+      <Banner message={bannerMessage} />
       <Filter newFilter={newFilter} handleFilterChange={handleFilterChange} />
 
       <h2>Add a new entry </h2>
